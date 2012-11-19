@@ -5,22 +5,23 @@
 
 package hudson.plugins.skype.im.transport;
 
-import com.skype.Chat;
-import com.skype.SkypeImpl;
 import hudson.model.Hudson;
-import hudson.model.Node;
 import hudson.model.Node.Mode;
 import hudson.plugins.im.DefaultIMMessageTarget;
 import hudson.plugins.im.IMMessageTarget;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.JNLPLauncher;
 import hudson.slaves.RetentionStrategy;
+
 import java.util.ArrayList;
+
+import org.junit.Ignore;
 import org.jvnet.hudson.test.HudsonTestCase;
 /**
  *
  * @author jbh
  */
+@Ignore("Should skype was installed.")
 public class SkypeIMConnectionTest extends HudsonTestCase {
     SkypeIMConnection instance = null;
     public SkypeIMConnectionTest(String testName) {
@@ -53,25 +54,25 @@ public class SkypeIMConnectionTest extends HudsonTestCase {
      * Test of connect method, of class SkypeIMConnection.
      */
     public void testConnect() throws Exception {
-        
+
         System.out.println("connect");
-        
+
         boolean expResult = true;
         boolean result = instance.isConnected();
         assertEquals(expResult, result);
-        
+
     }
 
-  
+
     /**
      * Test of send method, of class SkypeIMConnection.
      */
     public void testSend() throws Exception {
         System.out.println("send");
         IMMessageTarget target = new DefaultIMMessageTarget("no32717223");
-        String text = "TESTACSE";       
+        String text = "TESTACSE";
         instance.send(target, text);
-        
+
     }
 
     /**
@@ -99,7 +100,7 @@ public class SkypeIMConnectionTest extends HudsonTestCase {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-   
+
 
     /**
      * Test of addConnectionListener method, of class SkypeIMConnection.
@@ -124,5 +125,5 @@ public class SkypeIMConnectionTest extends HudsonTestCase {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-   
+
 }

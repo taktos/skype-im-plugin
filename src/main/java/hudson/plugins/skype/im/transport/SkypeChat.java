@@ -1,18 +1,16 @@
 package hudson.plugins.skype.im.transport;
 
-import com.skype.Chat;
-import com.skype.Chat.Status;
-import com.skype.SkypeImpl;
-import com.skype.SkypeException;
 import hudson.plugins.im.IMChat;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessageListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.skype.Chat;
+import com.skype.Chat.Status;
+import com.skype.SkypeException;
 
 /**
  * 1-on-1 Jabber chat.
- * 
+ *
  * @author kutzi
  */
 public class SkypeChat implements IMChat {
@@ -63,5 +61,10 @@ public class SkypeChat implements IMChat {
 
     public String getIMId(String user) {
         return user;
+    }
+
+    @Override
+    public boolean isCommandsAccepted() {
+        return true;
     }
 }

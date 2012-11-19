@@ -4,22 +4,25 @@
  */
 package hudson.plugins.skype.im.transport.callables;
 
-import com.skype.SkypeException;
-import com.skype.SkypeImpl;
-import com.skype.User;
-import com.skype.User.BuddyStatus;
 import hudson.plugins.skype.im.transport.SkypeIMException;
 import hudson.remoting.Callable;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.skype.Skype;
+import com.skype.SkypeException;
+import com.skype.User;
+import com.skype.User.BuddyStatus;
 
 /**
  *
  * @author jbh
  */
 public class SkypeVerifyUserCallable implements Callable<String, SkypeIMException> {
+    private static final Logger LOGGER = Logger.getLogger(SkypeVerifyUserCallable.class.getName());
 
     private String skypeNames = null;
 
@@ -30,12 +33,12 @@ public class SkypeVerifyUserCallable implements Callable<String, SkypeIMExceptio
     public String call() throws SkypeIMException {
         String result = null;
 
-        User usr = SkypeImpl.getUser(skypeNames);
+        User usr = Skype.getUser(skypeNames);
 
         try {
             if (usr == null || usr.getFullName() == null || usr.getFullName().trim().length() <= 0) {
                 usr = null;
-                User[] users = SkypeImpl.searchUsers(skypeNames);
+                User[] users = Skype.searchUsers(skypeNames);
                 if (skypeNames != null && skypeNames.contains("@")) {
                         //EMail, so this must be ok.
                     usr = users[0];
@@ -53,10 +56,10 @@ public class SkypeVerifyUserCallable implements Callable<String, SkypeIMExceptio
                 if (!usr.isAuthorized()) {
                     usr.setAuthorized(true);
                 }
-                System.out.println("BDY (" + usr.getDisplayName() + "):'" + bdyStatus + "' :'" + BuddyStatus.ADDED + "'");
+                LOGGER.fine("BDY (" + usr.getDisplayName() + "):'" + bdyStatus + "' :'" + BuddyStatus.ADDED + "'");
                 if (!usr.getBuddyStatus().equals(BuddyStatus.ADDED)) {
                     try {
-                        SkypeImpl.getContactList().addFriend(usr, "The Skype Service on " + InetAddress.getLocalHost().getHostName() + " wants to notify you");
+                        Skype.getContactList().addFriend(usr, "The Skype Service on " + InetAddress.getLocalHost().getHostName() + " wants to notify you");
                     } catch (UnknownHostException ex) {
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
                         throw new SkypeIMException(ex);

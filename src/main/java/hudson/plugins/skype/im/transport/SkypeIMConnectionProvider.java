@@ -10,31 +10,33 @@ import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMPublisherDescriptor;
 import hudson.slaves.ComputerListener;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Jabber implementation of an {@link IMConnectionProvider}.
- * 
+ *
  * @author Uwe Schaefer
  * @author kutzi
  */
-final class SkypeIMConnectionProvider extends IMConnectionProvider
-{
+final class SkypeIMConnectionProvider extends IMConnectionProvider {
+    private static final Logger LOGGER = Logger.getLogger(SkypeIMConnectionProvider.class.getName());
+
      private SkypeIMConnectionProvider() {
     	super();
-       
-    	
+
+
     }
     private static final SkypeIMConnectionProvider INSTANCE = new SkypeIMConnectionProvider();
-    
+
     static SkypeIMConnectionProvider getInstance() {
         return INSTANCE;
     }
-    
+
     static void setDesc(IMPublisherDescriptor desc) throws IMException {
     	synchronized(INSTANCE) {
-            INSTANCE.setDescriptor(desc);                  
-        }        
-    	
+            INSTANCE.setDescriptor(desc);
+        }
+
     }
     @Override
     public void setDescriptor(IMPublisherDescriptor desc) {
@@ -43,7 +45,7 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider
     }
 
     @Override
-    public IMConnection createConnection() throws IMException {       
+    public IMConnection createConnection() throws IMException {
         synchronized(INSTANCE) {
             if (getDescriptor() == null) {
         	throw new RuntimeException  ("No descriptor");
@@ -52,10 +54,10 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider
                             null);
             if (imConnection.connect()) {
                     return imConnection;
-            } 
+            }
         }
         throw new IMException("Connection failed");
-        
+
     }
     @Extension
    public static class SkypeComputerListener extends ComputerListener {
@@ -63,7 +65,7 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider
         public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
             if (c.getNode().getLabelString().contains("skype")) {
                 SkypeIMConnectionProvider.getInstance().connectionBroken(null);
-                System.out.println("Node came online, retry");
+                LOGGER.fine("Node came online, retry");
             }
         }
     }

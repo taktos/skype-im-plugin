@@ -10,7 +10,6 @@ import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
 import hudson.model.Slave;
-import hudson.model.User;
 import hudson.plugins.im.AbstractIMConnection;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
@@ -24,13 +23,11 @@ import hudson.plugins.skype.im.transport.callables.SkypeChatCallable;
 import hudson.plugins.skype.im.transport.callables.SkypeGroupChatCallable;
 import hudson.plugins.skype.im.transport.callables.SkypeSetupCallable;
 import hudson.plugins.skype.im.transport.callables.SkypeVerifyUserCallable;
-import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
 import java.io.IOException;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -134,26 +131,19 @@ class SkypeIMConnection extends AbstractIMConnection {
     }
 
     private synchronized boolean createConnection() throws IMException {
-        System.err.println("createConnection ");
+        LOGGER.fine("createConnection");
 
         Boolean result = Boolean.FALSE;
-        if (!System.getProperty("os.arch").contains("x86")) {
-            //List<Node> nodes = Hudson.getInstance().getNodes();
-            Label labelToFind = Label.get("skype");
-            if (labelToFind.isAssignable()) {
-                for (Node node : labelToFind.getNodes()) {
-                    if (verifySlave((Slave) node)) {
-                        result = Boolean.TRUE;
-                        break;
-                    }
-
+        Label labelToFind = Label.get("skype");
+        if (labelToFind.isAssignable()) {
+            for (Node node : labelToFind.getNodes()) {
+                if (verifySlave((Slave) node)) {
+                    result = Boolean.TRUE;
+                    break;
                 }
-            } else {
-                Logger.getLogger(SkypeIMConnection.class.getName()).log(Level.SEVERE, "Cannot find nodes with label skype");
             }
         } else {
-            Hudson hudson = Hudson.getInstance();
-            result = verifySlave(hudson);
+            LOGGER.severe("Cannot find nodes with label skype");
         }
         return result;
     }
@@ -179,9 +169,9 @@ class SkypeIMConnection extends AbstractIMConnection {
 
                 }
             } catch (IOException ex) {
-                Logger.getLogger(SkypeIMConnection.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             } catch (InterruptedException ex) {
-                Logger.getLogger(SkypeIMConnection.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         } else {
             result = Boolean.FALSE;
@@ -202,7 +192,7 @@ class SkypeIMConnection extends AbstractIMConnection {
             try {
                 SkypeChatCallable msgCallable;
                 if (target instanceof GroupChatIMMessageTarget) {
-                    System.out.println("Group:" + target);
+                    LOGGER.fine("Group:" + target);
                     msgCallable = new SkypeGroupChatCallable(target.toString(), text);
                 } else {
                     verifyUser(target);

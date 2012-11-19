@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package hudson.plugins.skype.im.transport;
 
@@ -14,6 +14,7 @@ import hudson.plugins.im.IMPublisherDescriptor;
 import hudson.plugins.im.MatrixJobMultiplier;
 import hudson.plugins.im.NotificationStrategy;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
+import hudson.plugins.im.config.ParameterNames;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
@@ -35,7 +36,6 @@ import net.sf.json.JSONObject;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.springframework.util.Assert;
@@ -50,11 +50,6 @@ public class SkypePublisherDescriptor extends BuildStepDescriptor<Publisher> imp
     public static final String PARAMETERNAME_GROUP_NICKNAME = SkypePublisherDescriptor.PREFIX + "groupNick";
     public static final String PARAMETERNAME_TARGETS = SkypePublisherDescriptor.PREFIX + "targets";
     public static final String PARAMETERNAME_STRATEGY = SkypePublisherDescriptor.PREFIX + "strategy";
-    public static final String PARAMETERNAME_NOTIFY_START = SkypePublisherDescriptor.PREFIX + "notifyStart";
-    public static final String PARAMETERNAME_NOTIFY_SUSPECTS = SkypePublisherDescriptor.PREFIX + "notifySuspects";
-    public static final String PARAMETERNAME_NOTIFY_CULPRITS = SkypePublisherDescriptor.PREFIX + "notifyCulprits";
-    public static final String PARAMETERNAME_NOTIFY_FIXERS = SkypePublisherDescriptor.PREFIX + "notifyFixers";
-    public static final String PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS = SkypePublisherDescriptor.PREFIX + "notifyUpstreamCommitters";
     public static final String PARAMETERNAME_INITIAL_GROUPCHATS = SkypePublisherDescriptor.PREFIX + "initialGroupChats";
     public static final String PARAMETERNAME_COMMAND_PREFIX = SkypePublisherDescriptor.PREFIX + "commandPrefix";
     public static final String PARAMETERNAME_DEFAULT_ID_SUFFIX = SkypePublisherDescriptor.PREFIX + "defaultIdSuffix";
@@ -199,7 +194,7 @@ public class SkypePublisherDescriptor extends BuildStepDescriptor<Publisher> imp
 
     /**
      * Returns the jabber ID.
-     * 
+     *
      * The jabber ID may have the syntax <user>[@<domain>[/<resource]]
      */
     public String getSkypeId() {
@@ -299,22 +294,22 @@ public class SkypePublisherDescriptor extends BuildStepDescriptor<Publisher> imp
                 n = PARAMETERVALUE_STRATEGY_DEFAULT;
             }
         }
-        boolean notifyStart = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_START));
-        boolean notifySuspects = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_SUSPECTS));
-        boolean notifyCulprits = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_CULPRITS));
-        boolean notifyFixers = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_FIXERS));
-        boolean notifyUpstream = "on".equals(req.getParameter(PARAMETERNAME_NOTIFY_UPSTREAM_COMMITTERS));
-        
+        boolean notifyStart = "on".equals(req.getParameter(getParamNames().getNotifyStart()));
+        boolean notifySuspects = "on".equals(req.getParameter(getParamNames().getNotifySuspects()));
+        boolean notifyCulprits = "on".equals(req.getParameter(getParamNames().getNotifyCulprits()));
+        boolean notifyFixers = "on".equals(req.getParameter(getParamNames().getNotifyFixers()));
+        boolean notifyUpstream = "on".equals(req.getParameter(getParamNames().getNotifyUpstreamCommitters()));
+
         MatrixJobMultiplier matrixJobMultiplier = MatrixJobMultiplier.ONLY_CONFIGURATIONS;
         if (formData.has("matrixNotifier")) {
             String o = formData.getString("matrixNotifier");
             matrixJobMultiplier = MatrixJobMultiplier.valueOf(o);
         }
-               
+
         return new SkypePublisher(targets, n, notifyStart, notifySuspects, notifyCulprits,
                     notifyFixers, notifyUpstream, req.bindJSON(BuildToChatNotifier.class,formData.getJSONObject("buildToChatNotifier")),
             		matrixJobMultiplier);
-       
+
     }
 
     /**
@@ -400,7 +395,7 @@ public class SkypePublisherDescriptor extends BuildStepDescriptor<Publisher> imp
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public boolean isApplicable(Class<? extends AbstractProject> jobType) {
         return true;
     }
@@ -431,5 +426,16 @@ public class SkypePublisherDescriptor extends BuildStepDescriptor<Publisher> imp
 
     public String getHost() {
         return "localhost";
+    }
+
+    @Override
+    public ParameterNames getParamNames() {
+        return new ParameterNames() {
+
+            @Override
+            protected String getPrefix() {
+                return PREFIX;
+            }
+        };
     }
 }

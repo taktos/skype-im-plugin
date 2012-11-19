@@ -22,6 +22,8 @@ import hudson.tasks.Publisher;
 import java.io.IOException;
 
 import java.util.List;
+import java.util.logging.Logger;
+
 import org.springframework.util.Assert;
 
 /**
@@ -31,8 +33,8 @@ import org.springframework.util.Assert;
  * @author Uwe Schaefer (original implementation)
  */
 public class SkypePublisher extends IMPublisher {
+    private static final Logger LOGGER = Logger.getLogger(SkypePublisher.class.getName());
 
-    
     @Extension
     public static final SkypePublisherDescriptor DESCRIPTOR = new SkypePublisherDescriptor();
     static final IMMessageTargetConverter CONVERTER = new SkypeIMMessageTargetConverter();
@@ -72,12 +74,12 @@ public class SkypePublisher extends IMPublisher {
         if (skypeUserProperty != null && skypeUserProperty.getSkypeId() != null && skypeUserProperty.getSkypeId().length() > 0) {
             result = skypeUserProperty.getSkypeId();
         } else {
-            try {                            
+            try {
                 Mailer.UserProperty prop = user.getProperty(Mailer.UserProperty.class);
-                System.out.println("TRying "+prop);
+                LOGGER.fine("Trying " + prop);
                 if (prop != null) {
                     SkypeVerifyUserCallable callable = new SkypeVerifyUserCallable(prop.getAddress());
-                    result = ((SkypeIMConnection)getIMConnection()).getChannel().call(callable);                    
+                    result = ((SkypeIMConnection)getIMConnection()).getChannel().call(callable);
                     user.addProperty(new SkypeUserProperty(result));
                     user.save();
                 }
@@ -109,7 +111,7 @@ public class SkypePublisher extends IMPublisher {
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
-    
+
     private static class SkypeIMMessageTargetConverter implements IMMessageTargetConverter {
 
         private void checkValidity(final String f) throws IMMessageTargetConversionException {
@@ -120,10 +122,10 @@ public class SkypePublisher extends IMPublisher {
             if (f.length() > 0) {
                 IMMessageTarget target;
                 if (f.startsWith("*")) {
-                    f = f.substring(1);                    
-                    target = new GroupChatIMMessageTarget(f);
+                    f = f.substring(1);
+                    target = new GroupChatIMMessageTarget(f, null, false);
                 } else if (f.contains("@conference.")) {
-                    target = new GroupChatIMMessageTarget(f);
+                    target = new GroupChatIMMessageTarget(f, null, false);
                 } else {
                     target = new DefaultIMMessageTarget(f);
                 }
