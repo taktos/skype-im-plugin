@@ -63,7 +63,6 @@ public class SkypeChat implements IMChat {
         return user;
     }
 
-    @Override
     public boolean isCommandsAccepted() {
         return true;
     }

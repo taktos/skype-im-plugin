@@ -131,14 +131,12 @@ class SkypeIMConnection extends AbstractIMConnection {
     }
 
     private synchronized boolean createConnection() throws IMException {
-        LOGGER.fine("createConnection");
-
-        Boolean result = Boolean.FALSE;
+        boolean result = false;
         Label labelToFind = Label.get("skype");
-        if (labelToFind.isAssignable()) {
+        if (labelToFind != null) {
             for (Node node : labelToFind.getNodes()) {
                 if (verifySlave((Slave) node)) {
-                    result = Boolean.TRUE;
+                    result = true;
                     break;
                 }
             }
@@ -148,35 +146,34 @@ class SkypeIMConnection extends AbstractIMConnection {
         return result;
     }
 
-    private Boolean verifySlave(Node slave) {
-        SkypeSetupCallable callable = new SkypeSetupCallable();
-        Boolean result = false;
-        Computer comp = slave.toComputer();
-        if (slave != null && comp != null && comp.isAcceptingTasks()) {
-            try {
-                result = (Boolean) slave.getChannel().call(callable);
-                if (result) {
-                    if (slave.getChannel() instanceof Channel) {
-                        ((Channel) slave.getChannel()).addListener(new Channel.Listener() {
-
-                            @Override
-                            public void onClosed(Channel channel, IOException cause) {
-                                skypeSlave = null;
-                            }
-                        });
-                    }
-                    skypeSlave = slave;
-
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
-        } else {
-            result = Boolean.FALSE;
+    private boolean verifySlave(Node slave) {
+        Assert.notNull(slave, "Parameter 'slave' must not be null.");
+        VirtualChannel channel = slave.getChannel();
+        if (channel == null) {
+            LOGGER.info(slave.getDisplayName() + " is offline.");
+            return false;
         }
-        return result;
+        try {
+            if (channel.call(new SkypeSetupCallable())) {
+                if (channel instanceof Channel) {
+                    ((Channel) channel).addListener(new Channel.Listener() {
+
+                        @Override
+                        public void onClosed(Channel channel, IOException cause) {
+                            skypeSlave = null;
+                        }
+                    });
+                }
+                skypeSlave = slave;
+                LOGGER.info("Connected to skype on " + slave.getDisplayName());
+                return true;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 
     public void send(final IMMessageTarget target, final String text)

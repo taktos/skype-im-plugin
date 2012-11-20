@@ -48,12 +48,11 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
     public IMConnection createConnection() throws IMException {
         synchronized(INSTANCE) {
             if (getDescriptor() == null) {
-        	throw new RuntimeException  ("No descriptor");
+                throw new RuntimeException("No descriptor");
             }
-            IMConnection imConnection = new SkypeIMConnection((SkypePublisherDescriptor)getDescriptor(),
-                            null);
+            IMConnection imConnection = new SkypeIMConnection((SkypePublisherDescriptor) getDescriptor(), null);
             if (imConnection.connect()) {
-                    return imConnection;
+                return imConnection;
             }
         }
         throw new IMException("Connection failed");
