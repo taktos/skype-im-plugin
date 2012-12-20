@@ -3,13 +3,8 @@
  */
 package hudson.plugins.skype.im.transport;
 
-import hudson.plugins.skype.im.transport.callables.SkypeMoodCallable;
-import com.skype.Profile;
-import hudson.model.Computer;
-import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
-import hudson.model.Slave;
 import hudson.plugins.im.AbstractIMConnection;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
@@ -17,27 +12,27 @@ import hudson.plugins.im.IMConnectionListener;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.IMPresence;
-import hudson.plugins.im.bot.Bot;
 import hudson.plugins.im.tools.ExceptionHelper;
 import hudson.plugins.skype.im.transport.callables.SkypeChatCallable;
 import hudson.plugins.skype.im.transport.callables.SkypeGroupChatCallable;
+import hudson.plugins.skype.im.transport.callables.SkypeMoodCallable;
 import hudson.plugins.skype.im.transport.callables.SkypeSetupCallable;
 import hudson.plugins.skype.im.transport.callables.SkypeVerifyUserCallable;
 import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
-import java.io.IOException;
 
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.mail.event.ConnectionListener;
 
-import org.acegisecurity.Authentication;
 import org.springframework.util.Assert;
+
+import com.skype.Profile;
 
 /**
  * Smack-specific implementation of {@link IMConnection}.
@@ -48,42 +43,18 @@ import org.springframework.util.Assert;
 class SkypeIMConnection extends AbstractIMConnection {
 
     private static final Logger LOGGER = Logger.getLogger(SkypeIMConnection.class.getName());
-    private final Set<Bot> bots = new HashSet<Bot>();
-    private final String passwd;
     private final String botCommandPrefix;
-    /**
-     * Jabber 'nick'. This is just the username-part of the Jabber-ID.
-     * I.e. for 'john.doe@gmail.com' it is 'john.doe'.
-     */
-    private final String nick = "hudson";
-    /**
-     * The nick name of the Hudson bot to use in group chats.
-     * May be null in which case the nick is used.
-     */
-    private final String groupChatNick;
-    /**
-     * Server name of the Jabber server.
-     */
-    private final String hostname;
-    private final int port;
     private final String[] groupChats;
     private IMPresence impresence;
     private String imStatusMessage;
     private final SkypePublisherDescriptor desc;
-    private final Authentication authentication;
     private Node skypeSlave = null;
 
-    SkypeIMConnection(SkypePublisherDescriptor desc, Authentication authentication) throws IMException {
+    SkypeIMConnection(SkypePublisherDescriptor desc) throws IMException {
         super(desc);
         Assert.notNull(desc, "Parameter 'desc' must not be null.");
         this.desc = desc;
-        this.authentication = authentication;
-        this.hostname = desc.getHost();
-        this.port = desc.getPort();
-        this.passwd = desc.getPassword();
 
-        this.groupChatNick = desc.getGroupChatNickname() != null
-                ? desc.getGroupChatNickname() : this.nick;
         this.botCommandPrefix = desc.getCommandPrefix();
         if (desc.getInitialGroupChats() != null) {
             this.groupChats = desc.getInitialGroupChats().trim().split("\\s");
@@ -135,7 +106,7 @@ class SkypeIMConnection extends AbstractIMConnection {
         Label labelToFind = Label.get("skype");
         if (labelToFind != null) {
             for (Node node : labelToFind.getNodes()) {
-                if (verifySlave((Slave) node)) {
+                if (verifySlave( node)) {
                     result = true;
                     break;
                 }
@@ -154,7 +125,7 @@ class SkypeIMConnection extends AbstractIMConnection {
             return false;
         }
         try {
-            if (channel.call(new SkypeSetupCallable())) {
+            if (channel.call(new SkypeSetupCallable(groupChats, botCommandPrefix))) {
                 if (channel instanceof Channel) {
                     ((Channel) channel).addListener(new Channel.Listener() {
 
@@ -316,10 +287,6 @@ class SkypeIMConnection extends AbstractIMConnection {
         return conn;
     }
 
-    public boolean isAuthorized(String xmppAddress) throws SkypeIMException {
-        //skypeServ.validateUser(xmppAddress);
-        return true;
-    }
     private final Map<IMConnectionListener, ConnectionListener> listeners =
             new ConcurrentHashMap<IMConnectionListener, ConnectionListener>();
 

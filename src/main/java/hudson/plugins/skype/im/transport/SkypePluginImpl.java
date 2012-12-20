@@ -2,11 +2,6 @@ package hudson.plugins.skype.im.transport;
 
 import hudson.Plugin;
 import hudson.plugins.im.IMPlugin;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.ServletContext;
 
 /**
  * Plugin entry point used to start/stop the plugin.
@@ -20,10 +15,7 @@ public class SkypePluginImpl extends Plugin {
 
     public SkypePluginImpl() {
         this.imPlugin = new IMPlugin(SkypeIMConnectionProvider.getInstance());
-
     }
-
-   
 
     /**
      * {@inheritDoc}

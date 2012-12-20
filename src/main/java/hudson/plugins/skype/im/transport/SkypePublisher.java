@@ -2,7 +2,6 @@ package hudson.plugins.skype.im.transport;
 
 import hudson.Extension;
 import hudson.model.User;
-import hudson.model.UserProperty;
 import hudson.plugins.im.DefaultIMMessageTarget;
 import hudson.plugins.im.GroupChatIMMessageTarget;
 import hudson.plugins.im.IMConnection;
@@ -10,17 +9,17 @@ import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessageTarget;
 import hudson.plugins.im.IMMessageTargetConversionException;
 import hudson.plugins.im.IMMessageTargetConverter;
-import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.MatrixJobMultiplier;
+import hudson.plugins.im.IMPublisher;
 import hudson.plugins.im.build_notify.BuildToChatNotifier;
 import hudson.plugins.skype.im.transport.callables.SkypeVerifyUserCallable;
 import hudson.plugins.skype.user.SkypeUserProperty;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Mailer;
 import hudson.tasks.Publisher;
-import java.io.IOException;
+import hudson.tasks.Mailer;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 

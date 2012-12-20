@@ -4,31 +4,33 @@
  */
 package hudson.plugins.skype.im.transport.callables;
 
-import com.skype.Chat;
-import com.skype.ChatMessage;
-import com.skype.SkypeException;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMMessage;
-import hudson.plugins.im.IMMessageListener;
 import hudson.plugins.im.bot.Bot;
 import hudson.plugins.skype.im.transport.SkypeChat;
 import hudson.plugins.skype.im.transport.SkypeIMException;
 import hudson.remoting.Callable;
 import hudson.remoting.Channel;
-import java.io.IOException;
+
+import com.skype.Chat;
+import com.skype.ChatMessage;
+import com.skype.SkypeException;
 
 /**
  *
  * @author jbh
  */
 public class BotCommandCallable implements Callable<Boolean, SkypeIMException> {
-    
-    Chat chat = null;    
+
+    Chat chat = null;
     String senderId = null;
     String toId = null;
     String content = null;
-    public BotCommandCallable(Chat chat, ChatMessage msg) throws SkypeIMException {
+    final String botCommandPrefix;
+
+    public BotCommandCallable(Chat chat, ChatMessage msg, String botCommandPrefix) throws SkypeIMException {
         this.chat = chat;
+        this.botCommandPrefix = botCommandPrefix;
         try {
             senderId = msg.getSenderId();
             toId = msg.getId();
@@ -45,12 +47,12 @@ public class BotCommandCallable implements Callable<Boolean, SkypeIMException> {
             public void sendMessage(String msg) throws IMException {
                 try {
                     SkypeChatCallable sender = new SkypeChatCallable(new String[]{senderId}, msg);
-                    Channel.current().call(sender);                    
-                    
+                    Channel.current().call(sender);
+
                 } catch (Exception ex) {
                     throw new IMException(ex);
                 }
-            }            
+            }
         };
         Bot bot = new Bot(skypeChat, "hudson",
                 "hostname", "!", null);

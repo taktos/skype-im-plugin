@@ -1,13 +1,13 @@
 package hudson.plugins.skype.im.transport;
 
+import hudson.plugins.im.IMMessage;
+import hudson.plugins.im.IMMessageListener;
+
 import java.util.logging.Logger;
 
-import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.ChatMessageListener;
 import com.skype.SkypeException;
-import hudson.plugins.im.IMMessage;
-import hudson.plugins.im.IMMessageListener;
 
 
 /**

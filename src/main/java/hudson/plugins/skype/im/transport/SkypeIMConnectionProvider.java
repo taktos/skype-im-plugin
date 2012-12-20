@@ -50,7 +50,7 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
             if (getDescriptor() == null) {
                 throw new RuntimeException("No descriptor");
             }
-            IMConnection imConnection = new SkypeIMConnection((SkypePublisherDescriptor) getDescriptor(), null);
+            IMConnection imConnection = new SkypeIMConnection((SkypePublisherDescriptor) getDescriptor());
             if (imConnection.connect()) {
                 return imConnection;
             }
