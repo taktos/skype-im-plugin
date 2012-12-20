@@ -428,7 +428,6 @@ public class SkypePublisherDescriptor extends BuildStepDescriptor<Publisher> imp
         return "localhost";
     }
 
-    @Override
     public ParameterNames getParamNames() {
         return new ParameterNames() {
 
