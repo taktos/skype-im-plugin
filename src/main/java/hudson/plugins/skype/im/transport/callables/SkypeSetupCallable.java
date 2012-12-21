@@ -12,7 +12,6 @@ import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,7 +88,19 @@ public class SkypeSetupCallable implements Callable<Boolean, SkypeIMException> {
 		}
 
 		private boolean isValidGroup(ChatMessage receivedChatMessage) throws SkypeException {
-			return groupChats.length == 0 || Arrays.asList(groupChats).contains(receivedChatMessage.getChat().getWindowTitle());
+			if (groupChats.length == 0) {
+				return true;
+			}
+			String chatName = receivedChatMessage.getChat().getWindowTitle();
+			for (String initial : groupChats) {
+				if (initial.charAt(0) == '*') {
+					initial = initial.substring(1);
+				}
+				if (initial.equals(chatName)) {
+					return true;
+				}
+			}
+			return false;
         }
 
 		private void getChat(String chatPartner, ChatMessage receivedChatMessage) {
