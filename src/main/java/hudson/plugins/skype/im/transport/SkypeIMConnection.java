@@ -3,6 +3,7 @@
  */
 package hudson.plugins.skype.im.transport;
 
+import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
 import hudson.plugins.im.AbstractIMConnection;
@@ -104,15 +105,17 @@ class SkypeIMConnection extends AbstractIMConnection {
     private synchronized boolean createConnection() throws IMException {
         boolean result = false;
         Label labelToFind = Label.get("skype");
-        if (labelToFind != null) {
+        if (labelToFind == null) {
+            LOGGER.info("Cannot find nodes with label skype. Trying to connect on master.");
+            Node master = Hudson.getInstance();
+            result = verifySlave(master);
+        } else {
             for (Node node : labelToFind.getNodes()) {
-                if (verifySlave( node)) {
+                if (verifySlave(node)) {
                     result = true;
                     break;
                 }
             }
-        } else {
-            LOGGER.severe("Cannot find nodes with label skype");
         }
         return result;
     }
