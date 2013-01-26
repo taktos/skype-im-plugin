@@ -6,7 +6,6 @@
         <version>1.466</version>
     </parent>
 
-    <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>skype-notifier</artifactId>
     <version>1.1.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
@@ -24,7 +23,7 @@
 
     <properties>
         <version.instant-messaging.plugin>1.24</version.instant-messaging.plugin>
-		<version.skype-java-api>1.4</version.skype-java-api>
+		<version.skype-java-api>1.5</version.skype-java-api>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
