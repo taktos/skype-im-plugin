@@ -1,14 +1,14 @@
 package hudson.plugins.skype.im.transport;
 
 import hudson.Extension;
-import hudson.model.Computer;
-import hudson.model.Hudson;
 import hudson.model.TaskListener;
+import hudson.model.Computer;
 import hudson.plugins.im.IMConnection;
 import hudson.plugins.im.IMConnectionProvider;
 import hudson.plugins.im.IMException;
 import hudson.plugins.im.IMPublisherDescriptor;
 import hudson.slaves.ComputerListener;
+
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -21,11 +21,10 @@ import java.util.logging.Logger;
 final class SkypeIMConnectionProvider extends IMConnectionProvider {
     private static final Logger LOGGER = Logger.getLogger(SkypeIMConnectionProvider.class.getName());
 
-     private SkypeIMConnectionProvider() {
-    	super();
-
-
+    private SkypeIMConnectionProvider() {
+        super();
     }
+
     private static final SkypeIMConnectionProvider INSTANCE = new SkypeIMConnectionProvider();
 
     static SkypeIMConnectionProvider getInstance() {
@@ -33,11 +32,11 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
     }
 
     static void setDesc(IMPublisherDescriptor desc) throws IMException {
-    	synchronized(INSTANCE) {
+        synchronized (INSTANCE) {
             INSTANCE.setDescriptor(desc);
         }
-
     }
+
     @Override
     public void setDescriptor(IMPublisherDescriptor desc) {
         super.setDescriptor(desc);
@@ -46,7 +45,7 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
 
     @Override
     public IMConnection createConnection() throws IMException {
-        synchronized(INSTANCE) {
+        synchronized (INSTANCE) {
             if (getDescriptor() == null) {
                 throw new RuntimeException("No descriptor");
             }
@@ -56,10 +55,10 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
             }
         }
         throw new IMException("Connection failed");
-
     }
+
     @Extension
-   public static class SkypeComputerListener extends ComputerListener {
+    public static class SkypeComputerListener extends ComputerListener {
         @Override
         public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
             if (c.getNode().getLabelString().contains("skype")) {
