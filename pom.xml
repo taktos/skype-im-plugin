@@ -22,7 +22,7 @@
     </developers>
 
     <properties>
-        <version.instant-messaging.plugin>1.24</version.instant-messaging.plugin>
+        <version.instant-messaging.plugin>1.27</version.instant-messaging.plugin>
 		<version.skype-java-api>1.5</version.skype-java-api>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
