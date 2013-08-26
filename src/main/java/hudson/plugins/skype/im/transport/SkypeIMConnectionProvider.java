@@ -39,8 +39,10 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
 
     @Override
     public void setDescriptor(IMPublisherDescriptor desc) {
-        super.setDescriptor(desc);
-        init();
+        if (desc != null && desc.isEnabled()) {
+            super.setDescriptor(desc);
+            init();
+        }
     }
 
     @Override
