@@ -105,7 +105,7 @@ class SkypeIMConnection extends AbstractIMConnection {
     private synchronized boolean createConnection() throws IMException {
         boolean result = false;
         Label labelToFind = Label.get("skype");
-        if (labelToFind == null) {
+        if (labelToFind == null || labelToFind.isEmpty()) {
             LOGGER.info("Cannot find nodes with label skype. Trying to connect on master.");
             Node master = Hudson.getInstance();
             result = verifySlave(master);
