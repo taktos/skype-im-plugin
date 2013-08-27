@@ -3,7 +3,6 @@
  */
 package hudson.plugins.skype.im.transport;
 
-import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
 import hudson.plugins.im.AbstractIMConnection;
@@ -30,6 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.event.ConnectionListener;
+
+import jenkins.model.Jenkins;
 
 import org.springframework.util.Assert;
 
@@ -105,9 +106,9 @@ class SkypeIMConnection extends AbstractIMConnection {
     private synchronized boolean createConnection() throws IMException {
         boolean result = false;
         Label labelToFind = Label.get("skype");
-        if (labelToFind == null || labelToFind.isEmpty()) {
+        if (labelToFind == null || Jenkins.getInstance().getNodes() == null || labelToFind.isEmpty()) {
             LOGGER.info("Cannot find nodes with label skype. Trying to connect on master.");
-            Node master = Hudson.getInstance();
+            Node master = Jenkins.getInstance();
             result = verifySlave(master);
         } else {
             for (Node node : labelToFind.getNodes()) {
