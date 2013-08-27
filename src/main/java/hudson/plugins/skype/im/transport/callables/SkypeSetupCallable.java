@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.ChatMessageListener;
+import com.skype.Profile.Status;
 import com.skype.Skype;
 import com.skype.SkypeException;
 
@@ -37,6 +38,7 @@ public class SkypeSetupCallable implements Callable<Boolean, SkypeIMException> {
 	}
 
 	public Boolean call() throws SkypeIMException {
+	    LOGGER.info("Connecting to skype");
 		try {
 			if (!Skype.isInstalled()) {
 				throw new RuntimeException("Skype not installed.");
@@ -46,6 +48,7 @@ public class SkypeSetupCallable implements Callable<Boolean, SkypeIMException> {
 			}
 			Skype.setDebug(true);
 			Skype.setDaemon(true);
+			Skype.getProfile().setStatus(Status.ONLINE);
 			addSkypeListener(Channel.current());
 			return true;
 		} catch (SkypeException ex) {
@@ -108,7 +111,7 @@ public class SkypeSetupCallable implements Callable<Boolean, SkypeIMException> {
 			try {
 				chat = receivedChatMessage.getChat();
 				if (masterChannel != null) {
-					masterChannel.call(new BotCommandCallable(chat, receivedChatMessage, botCommandPrefix));
+					masterChannel.call(new BotCommandCallable(receivedChatMessage.getSenderId(), receivedChatMessage.getId(), receivedChatMessage.getContent(), botCommandPrefix));
 				} else {
 					SkypeChat skypeChat = new SkypeChat(chat);
 					Bot bot = new Bot(skypeChat, "hudson", "hostname", botCommandPrefix, null);

@@ -8,7 +8,6 @@ package hudson.plugins.skype.im.transport.callables;
 import hudson.plugins.skype.im.transport.SkypeIMException;
 
 import com.skype.Chat;
-import com.skype.ChatMessage;
 import com.skype.Group;
 import com.skype.Skype;
 import com.skype.SkypeException;
@@ -26,7 +25,7 @@ public class SkypeGroupChatCallable extends SkypeChatCallable {
 
     }
     @Override
-    public ChatMessage call() throws SkypeIMException {
+    public Void call() throws SkypeIMException {
         try {
             Group group = Skype.getContactList().getGroup(chatName);
             Chat[] chats = Skype.getAllChats();
@@ -44,8 +43,8 @@ public class SkypeGroupChatCallable extends SkypeChatCallable {
             } else if (useChat == null) {
                 throw new SkypeIMException("Could not find group/category/chat "+chatName);
             }
-            return useChat.send(message);
-
+            useChat.send(message);
+            return null;
         } catch (SkypeException ex) {
             throw new SkypeIMException(ex);
         }

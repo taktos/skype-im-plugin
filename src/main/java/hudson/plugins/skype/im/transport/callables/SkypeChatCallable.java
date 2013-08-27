@@ -9,7 +9,6 @@ import hudson.plugins.skype.im.transport.SkypeIMException;
 import hudson.remoting.Callable;
 
 import com.skype.Chat;
-import com.skype.ChatMessage;
 import com.skype.Skype;
 import com.skype.SkypeException;
 
@@ -17,7 +16,7 @@ import com.skype.SkypeException;
  *
  * @author jbh
  */
-public class SkypeChatCallable implements Callable<ChatMessage, SkypeIMException> {
+public class SkypeChatCallable implements Callable<Void, SkypeIMException> {
     private String[] skypeNames = null;
     protected String message = null;
 
@@ -26,10 +25,11 @@ public class SkypeChatCallable implements Callable<ChatMessage, SkypeIMException
         this.message = msg;
 
     }
-    public ChatMessage call() throws SkypeIMException {
+    public Void call() throws SkypeIMException {
         try {
             Chat chat = Skype.chat(skypeNames);
-            return chat.send(message);
+            chat.send(message);
+            return null;
         } catch (SkypeException ex) {
             throw new SkypeIMException(ex);
         }

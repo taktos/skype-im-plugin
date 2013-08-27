@@ -23,6 +23,7 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
 
     private SkypeIMConnectionProvider() {
         super();
+        init();
     }
 
     private static final SkypeIMConnectionProvider INSTANCE = new SkypeIMConnectionProvider();
@@ -34,14 +35,6 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
     static void setDesc(IMPublisherDescriptor desc) throws IMException {
         synchronized (INSTANCE) {
             INSTANCE.setDescriptor(desc);
-        }
-    }
-
-    @Override
-    public void setDescriptor(IMPublisherDescriptor desc) {
-        if (desc != null && desc.isEnabled()) {
-            super.setDescriptor(desc);
-            init();
         }
     }
 
@@ -65,7 +58,7 @@ final class SkypeIMConnectionProvider extends IMConnectionProvider {
         public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
             if (c.getNode().getLabelString().contains("skype")) {
                 SkypeIMConnectionProvider.getInstance().connectionBroken(null);
-                LOGGER.fine("Node came online, retry");
+                LOGGER.fine("Node " + c.getName() + " came online, retry");
             }
         }
     }
