@@ -7,10 +7,14 @@ package hudson.plugins.skype.im.transport.callables;
 
 import hudson.plugins.skype.im.transport.SkypeIMException;
 
+import java.util.logging.Logger;
+
 import com.skype.Chat;
 import com.skype.Group;
 import com.skype.Skype;
 import com.skype.SkypeException;
+import com.skype.connector.Connector;
+import com.skype.connector.ConnectorException;
 
 /**
  *
@@ -31,7 +35,8 @@ public class SkypeGroupChatCallable extends SkypeChatCallable {
             Chat[] chats = Skype.getAllChats();
             Chat useChat = null;
             for (Chat chat : chats) {
-                if (chat.getWindowTitle().contains(chatName)) {
+                String topic = getProperty("CHAT", chat.getId(), "TOPIC");
+                if (topic != null && topic.contains(chatName)) {
                     useChat = chat;
                     break;
                 }
@@ -50,4 +55,15 @@ public class SkypeGroupChatCallable extends SkypeChatCallable {
         }
     }
 
+    private String getProperty(String type, String id, String name) throws SkypeException {
+        try {
+            String command = "GET " + type + " " + id + " " + name;
+            String responseHeader = type + " " + id + " " + name + " ";
+            String response = Connector.getInstance().execute(command, responseHeader);
+            return response.substring((responseHeader).length());
+        } catch (ConnectorException e) {
+            Logger.getLogger(this.getClass().getName()).severe(e.getLocalizedMessage());
+            return null;
+        }
+    }
 }
